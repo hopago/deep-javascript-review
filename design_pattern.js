@@ -98,3 +98,29 @@ console.log($("selector"));
  * DOM에서 이벤트가 발생 - DOM.dispatchEvent()를 통해 이벤트 전달 - propagation path에 따라 전달 수행
  * 전달 경로 중단에 있는 DOM이 삭제되더라도 이벤트는 전달된다
  */
+
+var controlVideo = document.getElementById("controlPanel"),
+    selectControlVideo = document.getElementById("controlVideo")
+var proxyClickEventHandler = (function () {
+    var cache = {};
+    return function (command) {
+        var video;
+        if (controlVideo.hasOwnProperty(command)) {
+            if (cache.hasOwnProperty(selectControlVideo.value)) {
+                video = cache[selectControlVideo.value]
+            } else {
+                video = controlVideo.getVideoById(selectControlVideo.value)
+                cache[selectControlVideo.value] = video;
+            }
+            controlVideo[command].call(this, video)
+        }
+    }
+})();
+proxyClickEventHandler(target.id)
+
+/** 시나리오: 
+ * selectControlVideo.value === "video2" -> 
+ * target.id === "play" -> proxyClickEventHandler("play") -> 
+ * video는 video2 -> controlVideo["play"].call(this, video) 
+ */
+
